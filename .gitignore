@@ -1,0 +1,25 @@
+# node modules
+node_modules/
+
+# Vite build output
+dist/
+
+# macOS
+.DS_Store
+
+# 環境変数
+.env
+.env.* # 例: .env.local, .env.production など
+
+# ログ
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE系
+.vscode/
+.idea/
+
+# OSごとの不要ファイル
+Thumbs.db
