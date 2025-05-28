@@ -11,7 +11,7 @@ function Chat({ roomId, userName }) {
 
     socket.onmessage = (event) => {
       const msgObj = JSON.parse(event.data);
-      setMessages((prev) => [...prev, event.data]);
+      setMessages((prev) => [...prev, msgObj]);
     };
 
     socket.onclose = () => {

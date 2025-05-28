@@ -23,3 +23,5 @@ pnpm-debug.log*
 
 # OSごとの不要ファイル
 Thumbs.db
+
+__pycache__/

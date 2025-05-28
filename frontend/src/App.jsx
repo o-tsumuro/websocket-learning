@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Chat from '.Chat';
+import Chat from './Chat';
 
 function App() {
   const [roomId, setRoomId] = useState('');
@@ -33,7 +33,7 @@ function App() {
           <button onClick={handleJoin}>入室</button>
         </div>
       ) : (
-        <Chat roomId={roomId} />
+        <Chat roomId={roomId} userName={userName} />
       )}
     </div>
   );
