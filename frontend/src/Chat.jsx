@@ -37,18 +37,42 @@ function Chat({ roomId, userName }) {
   return (
     <div>
       <h3>ルーム: {roomId}</h3>
-      <div style={{ border: '1px solid #ccc', padding: 10, height: 200, overflowY: 'scroll' }}>
-        {messages.map((msg, idx) => (
-          <div key={idx}>
-            <strong>{msg.name}:</strong> {msg.message}
-          </div>
-        ))}
+      <div
+        style={{
+          border: '1px solid #ccc',
+          padding: 10,
+          height: 200,
+          overflowY: 'scroll',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+        }}
+      >
+        {messages.map((msg, idx) => {
+          const isMe = msg.name === userName;
+          return (
+            <div
+              key={idx}
+              style={{
+                alignSelf: isMe ? 'flex-end' : 'flex-start',
+                backgroundColor: isMe ? '#dcf8c6' : '#f1f0f0',
+                padding: '8px 12px',
+                borderRadius: 10,
+                maxWidth: '70%',
+              }}
+            >
+              <strong style={{ fontSize: 12 }}>{msg.name}</strong>
+              <div>{msg.message}</div>
+            </div>
+          );
+        })}
       </div>
       <input
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
         placeholder="メッセージを入力"
+        style={{ width: '80%'}}
       />
       <button onClick={sendMessage}>送信</button>
     </div>
