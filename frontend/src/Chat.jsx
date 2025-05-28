@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
-function Chat({ roomId }) {
-  const [message, setMessage] = useState([]);
+function Chat({ roomId, userName }) {
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const ws = useRef(null);
 
@@ -10,7 +10,8 @@ function Chat({ roomId }) {
     ws.current = socket;
 
     socket.onmessage = (event) => {
-      setMessage((prev) => [...prev, event.data]);
+      const msgObj = JSON.parse(event.data);
+      setMessages((prev) => [...prev, event.data]);
     };
 
     socket.onclose = () => {
@@ -24,7 +25,11 @@ function Chat({ roomId }) {
 
   const sendMessage = () => {
     if (input.trim() && ws.current?.readyState === WebSocket.OPEN) {
-      ws.current.send(input);
+      const msgObj = {
+        name: userName,
+        message: input,
+      };
+      ws.current.send(JSON.stringify(msgObj));
       setInput('');
     }
   };
@@ -34,7 +39,9 @@ function Chat({ roomId }) {
       <h3>ルーム: {roomId}</h3>
       <div style={{ border: '1px solid #ccc', padding: 10, height: 200, overflowY: 'scroll' }}>
         {messages.map((msg, idx) => (
-          <div key={idx}>{msg}</div>
+          <div key={idx}>
+            <strong>{msg.name}:</strong> {msg.message}
+          </div>
         ))}
       </div>
       <input
