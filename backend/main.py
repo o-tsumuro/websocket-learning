@@ -12,34 +12,30 @@ app.add_middleware(
   allow_headers=["*"],
 )
 
-# ルームごとの接続管理
-class ConnectionManager:
-  def __init__(self):
-    self.active_connections: dict[str, list[WebSocket]] = {}
-
-  async def connect(self, room: str, websocket: WebSocket):
-    await websocket.accept()
-    if room not in self.active_connections:
-      self.active_connections[room] = []
-    self.active_connections[room].append(websocket)
-
-  def disconnect(self, room: str, websocket: WebSocket):
-    self.active_connections[room].remove(websocket)
-    if not self.active_connections[room]:
-      del self.active_connections[room]
-
-  async def broadcast(self, room: str, message: str):
-    for connection in self.active_connections.get(room, []):
-      await connection.send_text(message)
-
-manager = ConnectionManager()
+rooms = {}
 
 @app.websocket("/ws/{room_id}")
 async def websocket_endpoint(websocket: WebSocket, room_id: str):
-  await manager.connect(room_id, websocket)
+  await websocket.accept()
+
+  if room_id not in rooms:
+    rooms[room_id] = []
+
+  if len(rooms[room_id]) >= 2:
+    await websocket.send_text("error:room_full")
+    await websocket.close()
+    return
+  
+  rooms[room_id].append(websocket)
+  print(f"{room_id}に接続:{len(rooms[room_id])}人目")
+
   try:
     while True:
       data = await websocket.receive_text()
-      await manager.broadcast(room_id, data)
+      for client in rooms[room_id]:
+        await client.send_text(data)
   except WebSocketDisconnect:
-    manager.disconnect(room_id, websocket)
+    print("切断されました")
+    rooms[room_id].remove(websocket)
+    if len(rooms[room_id]) == 0:
+      del rooms[room_id]
