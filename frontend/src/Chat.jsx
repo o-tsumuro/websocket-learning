@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 function Chat({ roomId, userName }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [error, setError] = useState('');
   const ws = useRef(null);
 
   useEffect(() => {
@@ -10,7 +11,15 @@ function Chat({ roomId, userName }) {
     ws.current = socket;
 
     socket.onmessage = (event) => {
-      const msgObj = JSON.parse(event.data);
+      const msg = event.data;
+
+      if (msg === "error:room_full") {
+        setError('このルームは満員です。他のルームを選んで下さい。');
+        socket.close();
+        return;
+      }
+
+      const msgObj = JSON.parse(msg);
       setMessages((prev) => [...prev, msgObj]);
     };
 
@@ -33,6 +42,10 @@ function Chat({ roomId, userName }) {
       setInput('');
     }
   };
+
+  if (error) {
+    return <div style={{ color: 'red' }}>{error}</div>;
+  }
 
   return (
     <div>
