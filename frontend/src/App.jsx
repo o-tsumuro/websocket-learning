@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Chat from './Chat';
+import Chat from './pages/Chat';
 
 function App() {
   const [roomId, setRoomId] = useState('');
