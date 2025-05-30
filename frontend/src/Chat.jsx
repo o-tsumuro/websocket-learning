@@ -20,7 +20,15 @@ function Chat({ roomId, userName }) {
       }
 
       const msgObj = JSON.parse(msg);
-      setMessages((prev) => [...prev, msgObj]);
+
+      if (msgObj.type === 'coordinate') {
+        setMessages((prev) => [
+          ...prev,
+          { name: msgObj.sender, message: `📍座標が送信されました（緯度: ${msgObj.lat}, 経度: ${msgObj.lng}）` }
+        ]);
+      } else {
+        setMessages((prev) => [...prev, msgObj]);
+      }
     };
 
     socket.onclose = () => {
@@ -88,6 +96,21 @@ function Chat({ roomId, userName }) {
         style={{ width: '80%'}}
       />
       <button onClick={sendMessage}>送信</button>
+      <button
+        onClick={() => {
+          if (ws.current?.readyState === WebSocket.OPEN) {
+            const coordData = {
+              type: 'coordinate',
+              lat: 35.6895,
+              lng: 138.6917,
+              sender: userName,
+            };
+            ws.current.send(JSON.stringify(coordData));
+          }
+        }}
+      >
+        座標データを送信(東京)
+      </button>
     </div>
   );
 }
